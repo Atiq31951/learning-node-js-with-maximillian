@@ -5,7 +5,7 @@ const Path = require("path");
 
 const AdminRoute = require("./src/routes/admin");
 const ShopRoute = require("./src/routes/shop");
-const CommonRoute = require("./src/routes/common");
+const { GetErrorPage } = require('./src/controllers/error')
 
 const app = express();
 
@@ -21,12 +21,8 @@ app.use(express.static(Path.join(__dirname, "src", "public")));
 app.use(bodyParser(urlencoded({ extended: false })));
 
 app.use("/admin", AdminRoute);
-app.use("/shop", ShopRoute);
-app.use("/", CommonRoute);
+app.use("/", ShopRoute);
 
-app.use((req, res, next) => {
-  res.status(404);
-  res.render("pages/404", { pageTitle: "Page not found" });
-});
+app.use(GetErrorPage);
 
 app.listen(3000);
