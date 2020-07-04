@@ -6,18 +6,21 @@ const {
   AddProduct,
   DeleteProduct,
   UpdateProduct,
-  GetProducts
+  GetProducts,
 } = require("../models/Products");
 
 Route.get("/add-product", (req, res, next) => {
   res.status(200);
-  res.render('pages/add-product', { pageTitle: "Add product" });
+  res.render("pages/add-product", {
+    pageTitle: "Add product",
+    path: "add-product",
+  });
 });
 
 Route.post("/product", (req, res, next) => {
   // console.log("req.body ===> ", req.body);
-  const { title } = req.body
-  AddProduct({title})
+  const { title } = req.body;
+  AddProduct({ title });
   res.status(200);
   res.redirect("/");
 });

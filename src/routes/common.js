@@ -1,11 +1,15 @@
 const Express = require("express");
 const Route = Express.Router();
-const Path = require('path');
+const Path = require("path");
 const { GetProducts } = require("../models/Products");
 
 Route.get("/", (req, res, next) => {
   res.status(200);
-  res.render("pages/shop", { pageTitle: "Shop", products: GetProducts() });
+  res.render("pages/shop", {
+    pageTitle: "Shop",
+    products: GetProducts(),
+    path: "shop",
+  });
 });
 
 module.exports = Route;
