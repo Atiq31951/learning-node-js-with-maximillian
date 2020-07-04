@@ -25,7 +25,6 @@ app.use("/shop", ShopRoute);
 app.use("/", CommonRoute);
 
 app.use((req, res, next) => {
-  console.log("Hello we are here");
   res.status(404);
   res.render("pages/404", { pageTitle: "Page not found" });
 });
