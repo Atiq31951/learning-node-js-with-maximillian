@@ -5,10 +5,11 @@ const Route = Express.Router();
 const {
   GetAddProduct,
   PostAddProduct,
+  GetProducts,
 } = require("../controllers/admin");
 
 Route.get("/add-product", GetAddProduct);
 Route.post("/add-product", PostAddProduct);
-Route.get("/products");
+Route.get("/products", GetProducts);
 
 module.exports = Route;
