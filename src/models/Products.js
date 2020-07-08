@@ -1,7 +1,9 @@
 const Products = [];
 
 module.exports.AddProduct = (productObject) => {
-  productObject.id = Math.random(7) + new Date().getMilliseconds();
+  productObject.id = (
+    Number.parseInt(Math.random(7) * 1000) + new Date().getTime()
+  ).toString();
   Products.push(productObject);
 };
 
@@ -12,19 +14,19 @@ module.exports.DeleteProduct = (id) => {
       return;
     }
   });
-  return Products;
-};
-
-module.exports.UpdateProduct = (id, changedObject) => {
-  Products.forEach((product, index) => {
-    if (product.id === id) {
-      Products[index] = changedObject;
-      return;
-    }
-  });
-  return Products;
 };
 
 module.exports.GetProducts = () => {
   return Products;
+};
+
+module.exports.GetProduct = (productId) => {
+  return Products.find((product) => product.id === productId) || null;
+};
+
+module.exports.UpdateProduct = (productId, newProductObject) => {
+  const index = Products.findIndex((product) => product.id === productId);
+  if (Products[index]) {
+    Products[index] = newProductObject;
+  }
 };

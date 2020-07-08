@@ -1,0 +1,23 @@
+<%- include('../../partials/head') %>
+</head>
+
+<body>
+  <%- include('../../partials/navigation') %>
+  <main class="centered">
+    <% if (product != null ) { %>
+    <h1><%= product.title %> </h1>
+    <hr>
+    <div class="details_image">
+      <img class="details_image" src="<%= product.image_url %>" alt="A Book">
+    </div>
+    <h2>$<%= product.price %> </h2>
+    <p><%= product.description %> </p>
+    <div>
+      <%- include('../../partials/add-to-cart', {product}) %>
+    </div>
+    <% } else { %>
+    <h1>No product found like this...</h1>
+    <% } %>
+
+  </main>
+  <%- include('../../partials/end') %>
