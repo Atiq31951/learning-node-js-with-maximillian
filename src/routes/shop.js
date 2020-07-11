@@ -16,8 +16,8 @@ Route.get("/", GetIndex);
 Route.get("/products", GetProducts);
 Route.get("/product/:productId", GetProduct);
 Route.post("/cart", PostCart);
-Route.get("/cart", GetCart);
-Route.get("/checkout", GetCheckout);
-Route.get("/orders", GetOrders);
+// Route.get("/cart", GetCart);
+// Route.get("/checkout", GetCheckout);
+// Route.get("/orders", GetOrders);
 
 module.exports = Route;

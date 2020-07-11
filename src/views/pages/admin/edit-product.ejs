@@ -7,10 +7,9 @@
   <%- include('../../partials/navigation') %>
 
   <main>
-    <form class="product-form" action="/admin/update-product/<%= product.id %>" method="POST">
+    <form class="product-form" action="/admin/update-product/<%= product._id %>" method="POST">
       <div class="form-control">
         <label for="title">Title</label>
-        <% console.log("Product in this ===> ", product) %>
         <input type="text" value="<%= product.title %>" name="title" id="title">
       </div>
       <div class="form-control">
