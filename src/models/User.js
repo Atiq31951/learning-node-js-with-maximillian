@@ -1,12 +1,11 @@
 const mongoDb = require("mongodb");
 const { getDB } = require("../utils/database");
-const { use } = require("../routes/admin");
 
 class User {
-  constructor(userName, email, password, phoneNumber, role, id, cart) {
+  constructor(userName, email, password, contactNumber, role, id, cart) {
     this.user_name = userName;
     this.email = email;
-    this.contact_number = phoneNumber;
+    this.contact_number = contactNumber;
     this.password = password;
     this.role = role;
     this._id = id ? new mongoDb.ObjectId(id) : null;
@@ -106,7 +105,108 @@ class User {
     }
   }
 
+  async getCart() {
+    const DB = getDB();
+    const productIds = this.cart.items.map((item) => item._id) || [];
+    try {
+      const products = await DB.collection("products")
+        .find({ _id: { $in: productIds } })
+        .toArray();
+      products.map((item, index) => {
+        item.quantity = this.cart.items[index].quantity;
+      });
+      return {
+        items: products,
+        total_price: this.cart.total_price,
+        total_product: this.cart.items.reduce((acc, curr) => {
+          return acc + curr.quantity;
+        }, 0),
+      };
+    } catch (err) {
+      return err;
+    }
+  }
+
+  async updateCart(product_id, updatedQuantity) {
+    const DB = getDB();
+    const cartProductIndex = this.cart.items.findIndex(
+      (cp) => cp._id.toString() === product_id.toString()
+    );
+    const updatedCart = { ...this.cart };
+
+    if (updatedQuantity > 0) {
+      updatedCart.items[cartProductIndex].quantity = updatedQuantity;
+    } else {
+      updatedCart.items.splice(cartProductIndex, 1);
+    }
+
+    updatedCart.total_price = updatedCart.items.reduce((acc, curr, index) => {
+      return acc + curr.price * curr.quantity;
+    }, 0);
+    try {
+      await DB.collection("users").updateOne(
+        { _id: this._id },
+        {
+          $set: { ...this, cart: updatedCart },
+        }
+      );
+    } catch (err) {
+      console.log("Error occured ===> ", err);
+      return err;
+    }
+  }
+
   // Order related functionalities
+  async AddOrder() {
+    const DB = getDB();
+    let cartToBeInserted = { items: [], total_price: 0.0 };
+    try {
+      const itemIds = this.cart.items.map((item) => item._id);
+      const products = await DB.collection("products")
+        .find({ _id: { $in: itemIds } })
+        .toArray();
+      this.cart.items.forEach((item, index) => {
+        cartToBeInserted.items.push({
+          ...item,
+          ...products[index],
+        });
+      });
+      cartToBeInserted = {
+        ...cartToBeInserted,
+        total_price: this.cart.total_price,
+        user: {
+          _id: this._id,
+          name: this.user_name,
+          email: this.email,
+          contact_number: this.contact_number,
+        },
+        status: 1,
+      };
+      await DB.collection("orders").insertOne({ ...cartToBeInserted });
+      await DB.collection("users").updateOne(
+        { _id: this._id },
+        {
+          $set: {
+            cart: {},
+          },
+        }
+      );
+    } catch (err) {
+      console.log("Errr ===> ", err);
+    }
+  }
+
+  async GetOrders() {
+    const DB = getDB();
+    try {
+      const orders = await DB.collection("orders")
+        .find({ 'user._id': this._id })
+        .toArray();
+      return orders;
+    } catch (err) {
+      console.log("Error ==> ", err)
+    }
+  }
 }
 
 module.exports = User;

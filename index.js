@@ -32,7 +32,7 @@ app.use( async (req, res, next) => {
         user.user_name,
         user.email,
         user.password,
-        user.phone_number,
+        user.contact_number,
         user.role,
         user._id,
         user.cart

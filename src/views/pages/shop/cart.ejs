@@ -1,5 +1,97 @@
-<%- include('../../partials/head') %> 
+<%- include('../../partials/head.ejs') %>
+<link rel="stylesheet" href="/css/cart.css">
 </head>
+
 <body>
-<%- include('../../partials/navigation') %> 
-<%- include('../../partials/end') %> 
+  <%- include('../../partials/navigation.ejs') %>
+  <main>
+    <% if (cart.items.length > 0) { %>
+    <ul class="cart__item-list">
+      <% cart.items.forEach(p => { %>
+      <li class="cart__item">
+        <div class="product_image">
+          <img src="<%= p.image_url %>">
+        </div>
+        <div class="product_title">
+          <h1><%= p.title %></h1>
+        </div>
+        <div class="product_quantity">
+          <form action="/cart/<%= p._id%>?quantity=<%= p.quantity+1 %>" method="POST">
+            <button>
+              <img class="action_icon" src="/icons/svg/plus.svg" alt="plus_svg">
+            </button>
+          </form>
+          <h2><%= p.quantity %></h2>
+          <form action="/cart/<%= p._id%>?quantity=<%= p.quantity-1 %>" method="POST">
+            <button>
+              <img class="action_icon" src="/icons/svg/minus.svg" alt="minus_svg">
+            </button>
+          </form>
+        </div>
+        <div class="product_price">
+          <h2>$<%= p.price * p.quantity %></h2>
+        </div>
+        <div>
+          <form action="/cart/<%= p._id%>?quantity=0" method="POST">
+            <input type="hidden" value="<%= p._id %>" name="productId">
+            <button class="btn danger" type="submit">
+              <img class="action_icon" src="/icons/svg/close.svg" alt="close_svg">
+            </button>
+          </form>
+        </div>
+      </li>
+      <% }) %>
+      <li class="cart_total">
+        <div>
+          <h2>Order Summary</h2>
+        </div>
+        <div class="summary_sections">
+          <div class="description">
+            Subtotal (<%= cart.total_product %>)
+          </div>
+          <div class="value">
+            $<%= cart.total_price %>
+          </div>
+        </div>
+        <div class="summary_sections">
+          <div class="description">
+            Shipping charge
+          </div>
+          <div class="value">
+            $<%= cart.shipping_charge || 0 %>
+          </div>
+        </div>
+        <div class="summary_sections">
+          <div class="description">
+            Discount
+          </div>
+          <div class="value">
+            $<%= cart.discount || 0%>
+          </div>
+        </div>
+        <div class="summary_sections">
+          <input class="voucher_input" type="text" placeholder="Enter voucher code if u have.." />
+          <button type="submit" class="voucher_button">Apply</button>
+        </div>
+        <div class="summary_sections">
+          <div class="description">
+            Total
+          </div>
+          <div class="value">
+            $<%= cart.total_price %>
+          </div>
+        </div>
+      </li>
+    </ul>
+    <hr>
+    <div class="centered">
+      <form action="/orders" method="POST">
+        <button type="submit" class="btn">Order Now!</button>
+      </form>
+    </div>
+
+    <% } else { %>
+    <h1>No Products in Cart!</h1>
+    <% } %>
+  </main>
+  <%- include('../../partials/end.ejs') %>

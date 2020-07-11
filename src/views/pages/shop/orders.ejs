@@ -1,8 +1,26 @@
-<%- include('../../partials/head') %> 
+<%- include('../../partials/head.ejs') %>
+<link rel="stylesheet" href="/css/orders.css">
 </head>
+
 <body>
-  <%- include('../../partials/navigation') %> 
-  <main>
-    <h1>There is nothing to show....</h1>
-  </main>
-</body>
+    <%- include('../../partials/navigation.ejs') %>
+    <main>
+        <% if (orders.length <= 0) { %>
+        <h1>Nothing there!</h1>
+        <% } else { %>
+        <ul class="orders">
+            <% orders.forEach(order => { %>
+            <% console.log("Order ===> ", order) %>
+            <li class="orders__item">
+                <h1>Order - # <%= order._id %></h1>
+                <ul class="orders__products">
+                    <% order.items.forEach(product => { %>
+                    <li class="orders__products-item"><%= product.title %> (<%= product.quantity %>)</li>
+                    <% }); %>
+                </ul>
+            </li>
+            <% }); %>
+        </ul>
+        <% } %>
+    </main>
+    <%- include('../../partials/end.ejs') %>
