@@ -1,25 +1,13 @@
-const MongoDb = require("mongodb");
-const MongoDBClient = MongoDb.MongoClient;
-
-let _db;
+const mongoose = require('mongoose')
 
 exports.mongoConnect = async () => {
   const MongoUrl =
-    "mongodb+srv://test:test@cluster0.mnh64.mongodb.net/products?retryWrites=true&w=majority";
+    "mongodb+srv://test:test@cluster0.mnh64.mongodb.net/shop?retryWrites=true&w=majority";
   try {
-    MongoClient = await MongoDBClient.connect(MongoUrl, {
+    await mongoose.connect(MongoUrl, {
       useUnifiedTopology: true,
     });
-    _db = MongoClient.db();
   } catch (error) {
     return error;
-  }
-};
-
-exports.getDB = () => {
-  if (_db) {
-    return _db;
-  } else {
-    throw "Error occured";
   }
 };

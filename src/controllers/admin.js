@@ -1,4 +1,5 @@
 const Product = require("../models/Product");
+const { ObjectID } = require("mongodb");
 
 module.exports.GetAddProduct = (req, res, next) => {
   res.status(200);
@@ -10,8 +11,13 @@ module.exports.GetAddProduct = (req, res, next) => {
 
 module.exports.PostAddProduct = async (req, res, next) => {
   const { title, image_url, price, description } = req.body;
-  const product = new Product(title, Number(price), image_url, description);
   try {
+    const product = new Product({
+      title,
+      price: Number(price),
+      image_url,
+      description,
+    });
     await product.save();
     res.status(200);
     res.redirect("/admin/products");
@@ -24,7 +30,7 @@ module.exports.PostAddProduct = async (req, res, next) => {
 
 module.exports.GetProducts = async (req, res, next) => {
   try {
-    const products = await Product.fetchAll();
+    const products = await Product.find();
     res.status(200);
     res.render("pages/admin/products", {
       pageTitle: "Admin Products",
@@ -40,7 +46,7 @@ module.exports.GetProducts = async (req, res, next) => {
 module.exports.GetProductToEdit = async (req, res, next) => {
   const { productId } = req.params;
   try {
-    const product = await Product.fetchSingle(productId);
+    const product = await Product.findById(productId);
     if (!product) {
       res.redirect("/");
     }
@@ -58,11 +64,17 @@ module.exports.GetProductToEdit = async (req, res, next) => {
 module.exports.PostUpdateProduct = async (req, res, next) => {
   const { productId } = req.params;
   const { title, image_url, price, description } = req.body;
-  const product = new Product(title, Number(price), image_url, description, productId);
   try {
-    await product.updateProduct();
+    let product = await Product.findById(productId);
+    product.title = title
+    product.image_url = image_url;
+    product.price = price
+    product.description = description;
+
+    await product.save();
     res.redirect("/admin/products");
   } catch (err) {
+    console.log("Error ashse ==> ", err);
     res.redirect("/");
   }
 };
@@ -70,7 +82,7 @@ module.exports.PostUpdateProduct = async (req, res, next) => {
 module.exports.PostDeleteProduct = async (req, res, next) => {
   const { productId } = req.params;
   try {
-    await Product.deleteProduct(productId)
+    await Product.findByIdAndDelete(productId)
     res.redirect("/admin/products");
   } catch (error) {
     res.redirect("/");

@@ -24,27 +24,27 @@ app.use(bodyParser(urlencoded({ extended: false })));
 
 // Should be remove later
 const UserModel = require('./src/models/User');
-app.use( async (req, res, next) => {
-  try {
-    const user = await UserModel.fetchSingle("5f097fbd66fabbc1faa700fd");
-    if (user) {
-      req.user = new UserModel(
-        user.user_name,
-        user.email,
-        user.password,
-        user.contact_number,
-        user.role,
-        user._id,
-        user.cart
-      );
-      next();
-    } else {
-      GetErrorPage(req, res, next);
-    }
-  } catch (err) {
-    GetErrorPage(req, res, next);
-  }
-})
+// app.use( async (req, res, next) => {
+//   try {
+//     const user = await UserModel.fetchSingle("5f097fbd66fabbc1faa700fd");
+//     if (user) {
+//       req.user = new UserModel(
+//         user.user_name,
+//         user.email,
+//         user.password,
+//         user.contact_number,
+//         user.role,
+//         user._id,
+//         user.cart
+//       );
+//       next();
+//     } else {
+//       GetErrorPage(req, res, next);
+//     }
+//   } catch (err) {
+//     GetErrorPage(req, res, next);
+//   }
+// })
 
 
 app.use("/admin", AdminRoute);
