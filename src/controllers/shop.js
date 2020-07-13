@@ -1,10 +1,10 @@
 const { GetProducts, GetProduct } = require("../models/Product");
-const User = require("../models/User");
 const Product = require("../models/Product");
 
 exports.GetProducts = async (req, res, next) => {
   try {
     const products = await Product.find();
+    console.log("Here products", products)
     res.status(200);
     res.render("pages/shop/product-list", {
       pageTitle: "Products",
@@ -12,6 +12,7 @@ exports.GetProducts = async (req, res, next) => {
       products,
     });
   } catch (err) {
+    console.log("Error ==> ", err);
     res.redirect("/");
   }
   return;
@@ -52,7 +53,7 @@ exports.GetIndex = async (req, res, next) => {
 exports.PostCart = async (req, res, next) => {
   const { productId, productPrice } = req.body;
   try {
-    const selectedProduct = await Product.fetchSingle(productId);
+    const selectedProduct = await Product.findById(productId);
     await req.user.addToCart(selectedProduct);
     res.status(200);
     res.redirect("/cart");
@@ -64,7 +65,20 @@ exports.PostCart = async (req, res, next) => {
 
 exports.GetCart = async (req, res, next) => {
   try {
-    const cart = await req.user.getCart();
+    let user = await req.user.populate("cart.items.product_id").execPopulate();
+    cart = {};
+    cart.total_price = user.cart.total_price;
+    cart.items = [];
+
+    user.cart.items.forEach(item => {
+      const updatedItem = {
+        quantity: item.quantity,
+        ...item.product_id._doc,
+        _id: item._id,
+      };
+      cart.items.push(updatedItem)
+    })
+    console.log("Cart ===> ", cart)
     res.status(200);
     res.render("pages/shop/cart", {
       cart,

@@ -17,6 +17,7 @@ module.exports.PostAddProduct = async (req, res, next) => {
       price: Number(price),
       image_url,
       description,
+      owner_id: req.user._id,
     });
     await product.save();
     res.status(200);
@@ -29,9 +30,13 @@ module.exports.PostAddProduct = async (req, res, next) => {
 };
 
 module.exports.GetProducts = async (req, res, next) => {
+  console.log("has come here");
   try {
-    const products = await Product.find();
+    const products = await Product.find()
+      // .populate("owner_id", "name", "email")
+      // .select("title", "price", "description");
     res.status(200);
+    console.log("Products ===> ", products);
     res.render("pages/admin/products", {
       pageTitle: "Admin Products",
       path: "/admin/products",
@@ -66,9 +71,9 @@ module.exports.PostUpdateProduct = async (req, res, next) => {
   const { title, image_url, price, description } = req.body;
   try {
     let product = await Product.findById(productId);
-    product.title = title
+    product.title = title;
     product.image_url = image_url;
-    product.price = price
+    product.price = price;
     product.description = description;
 
     await product.save();
@@ -82,7 +87,7 @@ module.exports.PostUpdateProduct = async (req, res, next) => {
 module.exports.PostDeleteProduct = async (req, res, next) => {
   const { productId } = req.params;
   try {
-    await Product.findByIdAndDelete(productId)
+    await Product.findByIdAndDelete(productId);
     res.redirect("/admin/products");
   } catch (error) {
     res.redirect("/");

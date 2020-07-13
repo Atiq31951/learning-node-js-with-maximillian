@@ -21,31 +21,21 @@ app.use(express.static(Path.join(__dirname, "src", "public")));
 // BodyParser
 app.use(bodyParser(urlencoded({ extended: false })));
 
-
 // Should be remove later
-const UserModel = require('./src/models/User');
-// app.use( async (req, res, next) => {
-//   try {
-//     const user = await UserModel.fetchSingle("5f097fbd66fabbc1faa700fd");
-//     if (user) {
-//       req.user = new UserModel(
-//         user.user_name,
-//         user.email,
-//         user.password,
-//         user.contact_number,
-//         user.role,
-//         user._id,
-//         user.cart
-//       );
-//       next();
-//     } else {
-//       GetErrorPage(req, res, next);
-//     }
-//   } catch (err) {
-//     GetErrorPage(req, res, next);
-//   }
-// })
-
+const User = require("./src/models/User");
+app.use(async (req, res, next) => {
+  try {
+    const user = await User.findById("5f0bdbcd43320944f0f049af");
+    if (user) {
+      req.user = user
+      next();
+    } else {
+      GetErrorPage(req, res, next);
+    }
+  } catch (err) {
+    GetErrorPage(req, res, next);
+  }
+});
 
 app.use("/admin", AdminRoute);
 app.use("/", ShopRoute);
@@ -53,8 +43,22 @@ app.use("/", ShopRoute);
 app.use(GetErrorPage);
 
 mongoConnect()
+  // .then(() => {
+  //   const user = new User({
+  //     name: "Atiqur Rahman",
+  //     email: "atiqur.rahman951@gmail.com",
+  //     contact_number: "+8801771765449",
+  //     password: "13558766874",
+  //     role: 1,
+  //     cart: {
+  //       items: [],
+  //       total_price: 0.0,
+  //     }
+  //   })
+  //   user.save();
+  // })
   .then(() => {
-    console.log("Server started..")
+    console.log("Server started..");
     app.listen(3000);
   })
   .catch((error) => {
