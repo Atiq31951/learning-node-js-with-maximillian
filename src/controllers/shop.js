@@ -4,7 +4,6 @@ const Product = require("../models/Product");
 exports.GetProducts = async (req, res, next) => {
   try {
     const products = await Product.find();
-    console.log("Here products", products)
     res.status(200);
     res.render("pages/shop/product-list", {
       pageTitle: "Products",
@@ -78,7 +77,6 @@ exports.GetCart = async (req, res, next) => {
       };
       cart.items.push(updatedItem)
     })
-    console.log("Cart ===> ", cart)
     res.status(200);
     res.render("pages/shop/cart", {
       cart,

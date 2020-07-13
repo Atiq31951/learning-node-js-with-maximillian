@@ -86,6 +86,32 @@ UserSchema.methods.addToCart = async function (product) {
   }
 }
 
+
+  UserSchema.methods.updateCart = async function (product_id, updatedQuantity) {
+    const cartProductIndex = this.cart.items.findIndex(
+      (cp) => cp._id.toString() === product_id.toString()
+    );
+    const updatedCart = { ...this.cart };
+
+    if (updatedQuantity > 0) {
+      this.cart.items[cartProductIndex].quantity = updatedQuantity;
+    } else {
+      this.cart.items.splice(cartProductIndex, 1);
+    }
+
+    this.cart.total_price = updatedCart.items.reduce((acc, curr, index) => {
+      return acc + curr.price * curr.quantity;
+    }, 0);
+    try {
+      // cart.items = updatedCart.items
+      this.save();
+    } catch (err) {
+      console.log("Error occured ===> ", err);
+      return err;
+    }
+  };
+
+
 module.exports = mongoose.model("Users", UserSchema);
 
 // class User {

@@ -30,7 +30,6 @@ module.exports.PostAddProduct = async (req, res, next) => {
 };
 
 module.exports.GetProducts = async (req, res, next) => {
-  console.log("has come here");
   try {
     const products = await Product.find()
       // .populate("owner_id", "name", "email")
