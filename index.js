@@ -27,7 +27,7 @@ app.use(async (req, res, next) => {
   try {
     const user = await User.findById("5f0bdbcd43320944f0f049af");
     if (user) {
-      req.user = user
+      req.user = user;
       next();
     } else {
       GetErrorPage(req, res, next);

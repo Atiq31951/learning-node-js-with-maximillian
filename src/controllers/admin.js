@@ -23,7 +23,6 @@ module.exports.PostAddProduct = async (req, res, next) => {
     res.status(200);
     res.redirect("/admin/products");
   } catch (err) {
-    console.log("Error occured", err);
     res.render("/pages/admin/add-product");
   }
   return;
@@ -31,11 +30,8 @@ module.exports.PostAddProduct = async (req, res, next) => {
 
 module.exports.GetProducts = async (req, res, next) => {
   try {
-    const products = await Product.find()
-      // .populate("owner_id", "name", "email")
-      // .select("title", "price", "description");
+    const products = await Product.find();
     res.status(200);
-    console.log("Products ===> ", products);
     res.render("pages/admin/products", {
       pageTitle: "Admin Products",
       path: "/admin/products",
@@ -78,7 +74,6 @@ module.exports.PostUpdateProduct = async (req, res, next) => {
     await product.save();
     res.redirect("/admin/products");
   } catch (err) {
-    console.log("Error ashse ==> ", err);
     res.redirect("/");
   }
 };

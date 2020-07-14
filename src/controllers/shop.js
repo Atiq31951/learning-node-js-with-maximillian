@@ -11,7 +11,6 @@ exports.GetProducts = async (req, res, next) => {
       products,
     });
   } catch (err) {
-    console.log("Error ==> ", err);
     res.redirect("/");
   }
   return;
@@ -57,7 +56,6 @@ exports.PostCart = async (req, res, next) => {
     res.status(200);
     res.redirect("/cart");
   } catch (err) {
-    console.log("Error ==> ", err);
     return err;
   }
 };
@@ -69,14 +67,14 @@ exports.GetCart = async (req, res, next) => {
     cart.total_price = user.cart.total_price;
     cart.items = [];
 
-    user.cart.items.forEach(item => {
+    user.cart.items.forEach((item) => {
       const updatedItem = {
         quantity: item.quantity,
         ...item.product_id._doc,
         _id: item._id,
       };
-      cart.items.push(updatedItem)
-    })
+      cart.items.push(updatedItem);
+    });
     res.status(200);
     res.render("pages/shop/cart", {
       cart,
@@ -84,7 +82,7 @@ exports.GetCart = async (req, res, next) => {
       path: "/cart",
     });
   } catch (err) {
-    console.log("Err => ", err);
+    return err
   }
 };
 
@@ -101,8 +99,8 @@ exports.UpdateCart = async (req, res, next) => {
 
 exports.PostOrders = async (req, res, next) => {
   try {
-    await req.user.AddOrder();
-    res.redirect("/cart");
+    await req.user.createOrder();
+    res.redirect("/orders");
   } catch (err) {
     res.redirect("/cart");
   }
@@ -110,7 +108,18 @@ exports.PostOrders = async (req, res, next) => {
 
 exports.GetOrders = async (req, res, next) => {
   try {
-    const orders = await req.user.GetOrders();
+    const user = await req.user.populate("orders.order_id").execPopulate();
+
+    orders = [];
+
+    user.orders.forEach((order) => {
+      const updatedOrder = {
+        ...order.order_id._doc,
+        _id: order._id,
+      };
+      orders.push(updatedOrder);
+    });
+
     res.status(200);
     res.render("pages/shop/orders", {
       orders,

@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const Product = require("./Product");
+const Order = require("./Order");
 
 const UserSchema = new Schema({
   name: {
@@ -52,6 +52,15 @@ const UserSchema = new Schema({
       required: false,
     },
   },
+  orders: [
+    {
+      order_id: {
+        type: Schema.Types.ObjectId,
+        ref: "Order",
+        required: true,
+      },
+    },
+  ],
 });
 
 // Cart releted functionlities
@@ -101,67 +110,49 @@ UserSchema.methods.updateCart = async function (product_id, updatedQuantity) {
     return acc + curr.price * curr.quantity;
   }, 0);
   try {
-    // cart.items = updatedCart.items
-    this.save();
+    await this.save();
   } catch (err) {
     console.log("Error occured ===> ", err);
     return err;
   }
 };
 
+UserSchema.methods.createOrder = async function () {
+  const cartUser = this.populate("cart.items");
+  const productIds = cartUser.cart.items.map((item) => {
+    return item.product_id;
+  });
+  try {
+    const user = await this.populate("cart.items.product_id").execPopulate();
+    currentCart = {};
+    currentCart.total_price = user.cart.total_price;
+    currentCart.items = [];
+
+    user.cart.items.forEach((item, index) => {
+      const updatedItem = {
+        quantity: item.quantity,
+        ...item.product_id._doc,
+        product_id: productIds[index],
+        _id: item._id,
+      };
+      currentCart.items.push(updatedItem);
+    });
+    const order = new Order({
+      user_id: user._id,
+      created: new Date(),
+      stattus: 0,
+      total_price: currentCart.total_price,
+      items: currentCart.items,
+    });
+    await order.save();
+    this.orders.push({
+      order_id: order._id,
+    });
+    this.cart = {};
+    await this.save();
+  } catch (err) {
+    console.log("Errror in creating the order ===> ", err);
+  }
+};
+
 module.exports = mongoose.model("Users", UserSchema);
-
-//   // Order related functionalities
-//   async AddOrder() {
-//     const DB = getDB();
-//     let cartToBeInserted = { items: [], total_price: 0.0 };
-//     try {
-//       const itemIds = this.cart.items.map((item) => item._id);
-//       const products = await DB.collection("products")
-//         .find({ _id: { $in: itemIds } })
-//         .toArray();
-//       this.cart.items.forEach((item, index) => {
-//         cartToBeInserted.items.push({
-//           ...item,
-//           ...products[index],
-//         });
-//       });
-//       cartToBeInserted = {
-//         ...cartToBeInserted,
-//         total_price: this.cart.total_price,
-//         user: {
-//           _id: this._id,
-//           name: this.user_name,
-//           email: this.email,
-//           contact_number: this.contact_number,
-//         },
-//         status: 1,
-//       };
-//       await DB.collection("orders").insertOne({ ...cartToBeInserted });
-//       await DB.collection("users").updateOne(
-//         { _id: this._id },
-//         {
-//           $set: {
-//             cart: {},
-//           },
-//         }
-//       );
-//     } catch (err) {
-//       console.log("Errr ===> ", err);
-//     }
-//   }
-
-//   async GetOrders() {
-//     const DB = getDB();
-//     try {
-//       const orders = await DB.collection("orders")
-//         .find({ 'user._id': this._id })
-//         .toArray();
-//       return orders;
-//     } catch (err) {
-//       console.log("Error ==> ", err)
-//     }
-//   }
-// }
-
-// module.exports = User;
