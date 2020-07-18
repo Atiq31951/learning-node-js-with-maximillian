@@ -2,11 +2,15 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const { urlencoded } = require("body-parser");
 const Path = require("path");
+const session = require("express-session");
 
 const AdminRoute = require("./src/routes/admin");
 const ShopRoute = require("./src/routes/shop");
+const AuthRoute = require("./src/routes/auth");
+
 const { GetErrorPage } = require("./src/controllers/error");
 const { mongoConnect } = require("./src/utils/database");
+const { getCookiesObject } = require("./src/utils/auth");
 
 const app = express();
 
@@ -28,6 +32,8 @@ app.use(async (req, res, next) => {
     const user = await User.findById("5f0bdbcd43320944f0f049af");
     if (user) {
       req.user = user;
+      const cookiesObject = getCookiesObject(req);
+      req.isLoggedIn = req.isAdmin = cookiesObject["isLoggedIn"];
       next();
     } else {
       GetErrorPage(req, res, next);
@@ -39,6 +45,7 @@ app.use(async (req, res, next) => {
 
 app.use("/admin", AdminRoute);
 app.use("/", ShopRoute);
+app.use("/", AuthRoute);
 
 app.use(GetErrorPage);
 

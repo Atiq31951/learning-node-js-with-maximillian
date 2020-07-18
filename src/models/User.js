@@ -87,7 +87,7 @@ UserSchema.methods.addToCart = async function (product) {
   }, 0);
   this.cart = updatedCart;
   try {
-    this.save();
+    await this.save();
   } catch (err) {
     console.log("Error occured ===> ", err);
     return err;

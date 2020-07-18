@@ -9,6 +9,8 @@ exports.GetProducts = async (req, res, next) => {
       pageTitle: "Products",
       path: "/products",
       products,
+      isLoggedIn: req.user.isLoggedIn,
+      isAdmin: req.user.isAdmin,
     });
   } catch (err) {
     res.redirect("/");
@@ -26,6 +28,8 @@ exports.GetProduct = async (req, res, next) => {
       pageTitle: `${product ? product.title : "error"}`,
       product: product,
       path: "/product",
+      isLoggedIn: req.user.isLoggedIn,
+      isAdmin: req.user.isAdmin,
     });
   } catch (err) {
     res.redirect("/");
@@ -41,6 +45,8 @@ exports.GetIndex = async (req, res, next) => {
       pageTitle: "Shop",
       products,
       path: "/",
+      isLoggedIn: req.user.isLoggedIn,
+      isAdmin: req.user.isAdmin,
     });
   } catch (err) {
     res.redirect("/");
@@ -80,6 +86,8 @@ exports.GetCart = async (req, res, next) => {
       cart,
       pageTitle: "Your Cart",
       path: "/cart",
+      isLoggedIn: req.user.isLoggedIn,
+      isAdmin: req.user.isAdmin,
     });
   } catch (err) {
     return err
@@ -125,6 +133,8 @@ exports.GetOrders = async (req, res, next) => {
       orders,
       pageTitle: "Orders",
       path: "/orders",
+      isLoggedIn: req.user.isLoggedIn,
+      isAdmin: req.user.isAdmin,
     });
   } catch (err) {
     console.log("Err ==> ", err);
@@ -136,5 +146,7 @@ exports.GetCheckout = (req, res, next) => {
   res.render("pages/shop/checkout", {
     pageTitle: "Checkout",
     path: "/checkout",
+    isLoggedIn: req.user.isLoggedIn,
+    isAdmin: req.user.isAdmin,
   });
 };

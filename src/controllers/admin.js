@@ -6,6 +6,8 @@ module.exports.GetAddProduct = (req, res, next) => {
   res.render("pages/admin/add-product", {
     pageTitle: "Add product",
     path: "/admin/add-product",
+    isLoggedIn: req.user.isLoggedIn,
+    isAdmin: req.user.isAdmin
   });
 };
 
@@ -23,7 +25,7 @@ module.exports.PostAddProduct = async (req, res, next) => {
     res.status(200);
     res.redirect("/admin/products");
   } catch (err) {
-    res.render("/pages/admin/add-product");
+    res.redirect("/admin/add-product");
   }
   return;
 };
@@ -36,6 +38,8 @@ module.exports.GetProducts = async (req, res, next) => {
       pageTitle: "Admin Products",
       path: "/admin/products",
       products,
+      isLoggedIn: req.user.isLoggedIn,
+      isAdmin: req.user.isAdmin,
     });
   } catch (err) {
     res.redirect("/");
@@ -55,6 +59,8 @@ module.exports.GetProductToEdit = async (req, res, next) => {
       pageTitle: `${product ? "Edit Product" : "error"}`,
       product: product,
       path: "/edit-product",
+      isLoggedIn: req.user.isLoggedIn,
+      isAdmin: req.user.isAdmin,
     });
   } catch (err) {
     res.redirect("/pages/error");
