@@ -3,6 +3,7 @@ const bodyParser = require("body-parser");
 const { urlencoded } = require("body-parser");
 const Path = require("path");
 const session = require("express-session");
+const MongoDBStore = require("connect-mongodb-session")(session);
 
 const AdminRoute = require("./src/routes/admin");
 const ShopRoute = require("./src/routes/shop");
@@ -10,7 +11,6 @@ const AuthRoute = require("./src/routes/auth");
 
 const { GetErrorPage } = require("./src/controllers/error");
 const { mongoConnect } = require("./src/utils/database");
-const { getCookiesObject } = require("./src/utils/auth");
 
 const app = express();
 
@@ -25,15 +25,37 @@ app.use(express.static(Path.join(__dirname, "src", "public")));
 // BodyParser
 app.use(bodyParser(urlencoded({ extended: false })));
 
-// Should be remove later
+// Session section
+
+const store = new MongoDBStore({
+  uri:
+    "mongodb+srv://test:test@cluster0.mnh64.mongodb.net/shop?retryWrites=true&w=majority",
+  collection: "session",
+});
+
+app.use(
+  session({
+    secret:
+      "We Are In The Black Edetion, and darkness will be removed inshallah",
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      maxAge: 2592000,
+    },
+    store,
+  })
+);
+
+// Should be removed later
 const User = require("./src/models/User");
 app.use(async (req, res, next) => {
+  if (!req.session.user) {
+    return next();
+  }
   try {
-    const user = await User.findById("5f0bdbcd43320944f0f049af");
+    const user = await User.findById(req.session.user._id);
     if (user) {
       req.user = user;
-      const cookiesObject = getCookiesObject(req);
-      req.isLoggedIn = req.isAdmin = cookiesObject["isLoggedIn"];
       next();
     } else {
       GetErrorPage(req, res, next);
@@ -50,20 +72,6 @@ app.use("/", AuthRoute);
 app.use(GetErrorPage);
 
 mongoConnect()
-  // .then(() => {
-  //   const user = new User({
-  //     name: "Atiqur Rahman",
-  //     email: "atiqur.rahman951@gmail.com",
-  //     contact_number: "+8801771765449",
-  //     password: "13558766874",
-  //     role: 1,
-  //     cart: {
-  //       items: [],
-  //       total_price: 0.0,
-  //     }
-  //   })
-  //   user.save();
-  // })
   .then(() => {
     console.log("Server started..");
     app.listen(3000);

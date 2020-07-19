@@ -13,7 +13,9 @@
     <h2>$<%= product.price %> </h2>
     <p><%= product.description %> </p>
     <div>
-      <%- include('../../partials/add-to-cart', {product}) %>
+      <% if (isLoggedIn) { %>
+        <%- include('../../partials/add-to-cart', {product}) %>
+      <% } %>
     </div>
     <% } else { %>
     <h1>No product found like this...</h1>

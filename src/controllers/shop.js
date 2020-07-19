@@ -5,12 +5,17 @@ exports.GetProducts = async (req, res, next) => {
   try {
     const products = await Product.find();
     res.status(200);
+    let isLoggedIn = req.session.isLoggedIn || false;
+    console.log('isLoggedIn: ', isLoggedIn);
+    let isAdmin = req.session.isAdmin || false;
+    console.log('isAdmin: ', isAdmin);
+
     res.render("pages/shop/product-list", {
       pageTitle: "Products",
       path: "/products",
       products,
-      isLoggedIn: req.user.isLoggedIn,
-      isAdmin: req.user.isAdmin,
+      isLoggedIn,
+      isAdmin,
     });
   } catch (err) {
     res.redirect("/");
@@ -28,8 +33,8 @@ exports.GetProduct = async (req, res, next) => {
       pageTitle: `${product ? product.title : "error"}`,
       product: product,
       path: "/product",
-      isLoggedIn: req.user.isLoggedIn,
-      isAdmin: req.user.isAdmin,
+      isLoggedIn: req.session.isLoggedIn,
+      isAdmin: req.session.isAdmin,
     });
   } catch (err) {
     res.redirect("/");
@@ -41,12 +46,14 @@ exports.GetIndex = async (req, res, next) => {
   try {
     const products = await Product.find();
     res.status(200);
+    console.log("isLoggedIn: ", req.session.isLoggedIn);
+    console.log("isAdmin: ", req.session.isAdmin);
     res.render("pages/shop/index", {
       pageTitle: "Shop",
       products,
       path: "/",
-      isLoggedIn: req.user.isLoggedIn,
-      isAdmin: req.user.isAdmin,
+      isLoggedIn: req.session.isLoggedIn,
+      isAdmin: req.session.isAdmin,
     });
   } catch (err) {
     res.redirect("/");
@@ -86,8 +93,8 @@ exports.GetCart = async (req, res, next) => {
       cart,
       pageTitle: "Your Cart",
       path: "/cart",
-      isLoggedIn: req.user.isLoggedIn,
-      isAdmin: req.user.isAdmin,
+      isLoggedIn: req.session.isLoggedIn,
+      isAdmin: req.session.isAdmin,
     });
   } catch (err) {
     return err
@@ -133,8 +140,8 @@ exports.GetOrders = async (req, res, next) => {
       orders,
       pageTitle: "Orders",
       path: "/orders",
-      isLoggedIn: req.user.isLoggedIn,
-      isAdmin: req.user.isAdmin,
+      isLoggedIn: req.session.isLoggedIn,
+      isAdmin: req.session.isAdmin,
     });
   } catch (err) {
     console.log("Err ==> ", err);
@@ -146,7 +153,7 @@ exports.GetCheckout = (req, res, next) => {
   res.render("pages/shop/checkout", {
     pageTitle: "Checkout",
     path: "/checkout",
-    isLoggedIn: req.user.isLoggedIn,
-    isAdmin: req.user.isAdmin,
+    isLoggedIn: req.session.isLoggedIn,
+    isAdmin: req.session.isAdmin,
   });
 };
