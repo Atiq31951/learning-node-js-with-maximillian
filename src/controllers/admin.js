@@ -1,5 +1,4 @@
 const Product = require("../models/Product");
-const { ObjectID } = require("mongodb");
 
 module.exports.GetAddProduct = (req, res, next) => {
   res.status(200);
@@ -7,8 +6,9 @@ module.exports.GetAddProduct = (req, res, next) => {
     pageTitle: "Add product",
     path: "/admin/add-product",
     isLoggedIn: req.session.isLoggedIn,
-    isAdmin: req.session.isAdmin
+    isAdmin: req.session.isAdmin,
   });
+  return;
 };
 
 module.exports.PostAddProduct = async (req, res, next) => {
@@ -65,6 +65,7 @@ module.exports.GetProductToEdit = async (req, res, next) => {
   } catch (err) {
     res.redirect("/pages/error");
   }
+  return;
 };
 
 module.exports.PostUpdateProduct = async (req, res, next) => {
@@ -82,6 +83,7 @@ module.exports.PostUpdateProduct = async (req, res, next) => {
   } catch (err) {
     res.redirect("/");
   }
+  return;
 };
 
 module.exports.PostDeleteProduct = async (req, res, next) => {
@@ -92,4 +94,5 @@ module.exports.PostDeleteProduct = async (req, res, next) => {
   } catch (error) {
     res.redirect("/");
   }
+  return;
 };
