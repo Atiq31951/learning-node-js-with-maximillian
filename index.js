@@ -4,6 +4,7 @@ const { urlencoded } = require("body-parser");
 const Path = require("path");
 const session = require("express-session");
 const MongoDBStore = require("connect-mongodb-session")(session);
+const flash = require("connect-flash");
 
 const AdminRoute = require("./src/routes/admin");
 const ShopRoute = require("./src/routes/shop");
@@ -35,8 +36,7 @@ const store = new MongoDBStore({
 
 app.use(
   session({
-    secret:
-      "We Are In The Black Edetion, and darkness will be removed inshallah",
+    secret: "73KsRFBcLaTp32npRgP_Ltpmn92_qaP2@dDqf",
     resave: false,
     saveUninitialized: false,
     cookie: {
@@ -46,7 +46,6 @@ app.use(
   })
 );
 
-// Should be removed later
 const User = require("./src/models/User");
 app.use(async (req, res, next) => {
   if (!req.session.user) {
@@ -64,6 +63,10 @@ app.use(async (req, res, next) => {
     GetErrorPage(req, res, next);
   }
 });
+
+// Flash global variables
+
+app.use(flash());
 
 app.use("/admin", AdminRoute);
 app.use("/", ShopRoute);
