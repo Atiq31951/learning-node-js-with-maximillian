@@ -1,0 +1,26 @@
+<%- include('../../partials/head.ejs') %>
+<link rel="stylesheet" href="/css/forms.css">
+<link rel="stylesheet" href="/css/auth.css">
+</head>
+
+<body>
+  <%- include('../../partials/navigation.ejs') %>
+
+
+  <main>
+    <% if (errorMessage) { %>
+    <div class="user-message user-message-error">
+      <%= errorMessage %>
+    </div>
+    <% } %>
+
+    <form class="login-form" action="/activate" method="POST">
+      <input type="hidden" name="email" id="email" value="<%= userEmail %>">
+      <div class="form-control">
+        <label for="validation_code">Email validation code</label>
+        <input type="text" name="validation_code" id="validation_code">
+      </div>
+      <button class="btn" type="submit">Activate</button>
+    </form>
+  </main>
+  <%- include('../../partials/end.ejs') %>

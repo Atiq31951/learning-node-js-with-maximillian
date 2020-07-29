@@ -1,7 +1,10 @@
 const bcrypt = require("bcryptjs");
 
 const User = require("../models/User");
+
 const { SendEmailTo } = require("../utils/sendEmail");
+const { getSixDigitOTP } = require("../utils/auth");
+const auth = require("../utils/auth");
 
 exports.GetLogin = (req, res, next) => {
   if (req.session.user) {
@@ -54,7 +57,7 @@ exports.PostLogin = async (req, res, next) => {
     return;
   } catch (err) {
     res.redirect("/login");
-    console.log("err", err);
+    console.log("Error in PostLogin", err);
   }
 };
 
@@ -109,9 +112,9 @@ exports.PostSignUp = async (req, res, next) => {
     if (userExist) {
       res.redirect("/sign-up");
     }
-    const result = await SendEmailTo(email);
-    console.log("Result ===> ", result);
     const hashedPassword = await bcrypt.hash(password, 12);
+    const email_validation_code = getSixDigitOTP();
+    SendEmailTo({ email, name, email_validation_code });
     const user = new User({
       name,
       email,
@@ -120,11 +123,57 @@ exports.PostSignUp = async (req, res, next) => {
       role,
       cart: { items: [], total_price: 0.0 },
       orders: [],
+      active: false,
+      email_validation_code,
     });
-    // await user.save();
-    res.redirect("/login");
+    await user.save();
+    res.redirect(`/activate?email=${email}`);
   } catch (err) {
-    console.log("Errr ====> ", err);
+    console.log("Error in PostSignUp ", err);
     res.redirect("/sign-up");
+  }
+};
+
+exports.GetActivate = async (req, res, next) => {
+  const { email } = req.query;
+  try {
+    const userExist = await User.findOne({ email });
+    if (userExist && !userExist.active) {
+      res.render("pages/auth/activate", {
+        userEmail: email,
+        isLoggedIn: false,
+        isAdmin: false,
+        pageTitle: "Activation",
+        path: "/activate",
+        errorMessage: null,
+      });
+    } else {
+      res.redirect("/login");
+    }
+  } catch (error) {
+    res.redirect("/login");
+    console.log("Error in the GetActivate");
+  }
+};
+
+exports.PostActivate = async (req, res, next) => {
+  const { email, validation_code } = req.body;
+  try {
+    const user = await User.findOne({ email });
+    if (
+      user &&
+      user.email_validation_code === validation_code &&
+      !user.active
+    ) {
+      user.active = true;
+      user.email_validation_code = null;
+      await user.save();
+      res.redirect("/login");
+    } else {
+      res.redirect("/login");
+    }
+  } catch (err) {
+    res.redirect(`/activate?email=${email}`);
+    console.log("Error in PostActivate ", err);
   }
 };

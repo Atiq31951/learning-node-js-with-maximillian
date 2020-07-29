@@ -61,6 +61,15 @@ const UserSchema = new Schema({
       },
     },
   ],
+  active: {
+    type: Boolean,
+    default: false,
+    required: false,
+  },
+  email_validation_code: {
+    type: String,
+    required: false,
+  },
 });
 
 // Cart releted functionlities
@@ -89,7 +98,7 @@ UserSchema.methods.addToCart = async function (product) {
   try {
     await this.save();
   } catch (err) {
-    console.log("Error occured ===> ", err);
+    console.log("Error in addToCart ", err);
     return err;
   }
 };
@@ -112,7 +121,7 @@ UserSchema.methods.updateCart = async function (product_id, updatedQuantity) {
   try {
     await this.save();
   } catch (err) {
-    console.log("Error occured ===> ", err);
+    console.log("Error in updateCart ", err);
     return err;
   }
 };
@@ -151,7 +160,7 @@ UserSchema.methods.createOrder = async function () {
     this.cart = {};
     await this.save();
   } catch (err) {
-    console.log("Errror in creating the order ===> ", err);
+    console.log("Error in createOrder ", err);
   }
 };
 

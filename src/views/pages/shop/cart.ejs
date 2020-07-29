@@ -33,7 +33,7 @@
         </div>
         <div>
           <form action="/cart/<%= p._id%>?quantity=0" method="POST">
-            <input type="hidden" value="<%= p._id %>" name="productId">
+            <input type="hidden" value="<%= p._id %>" name="<%= productId%>">
             <button class="btn danger" type="submit">
               <img class="action_icon" src="/icons/svg/close.svg" alt="close_svg">
             </button>

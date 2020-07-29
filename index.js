@@ -80,5 +80,5 @@ mongoConnect()
     app.listen(3000);
   })
   .catch((error) => {
-    console.log(error);
+    console.log("Error in connectMongoDb", error);
   });

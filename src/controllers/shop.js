@@ -93,7 +93,7 @@ exports.GetCart = async (req, res, next) => {
       isAdmin: req.session.isAdmin || false,
     });
   } catch (err) {
-    return err
+    return err;
   }
 };
 
@@ -140,7 +140,7 @@ exports.GetOrders = async (req, res, next) => {
       isAdmin: req.session.isAdmin || false,
     });
   } catch (err) {
-    console.log("Err ==> ", err);
+    console.log("Error in GetOrders ", err);
   }
 };
 

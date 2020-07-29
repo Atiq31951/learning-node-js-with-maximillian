@@ -1,4 +1,5 @@
 const nodemailer = require("nodemailer");
+
 const getHtmlWithSecreteToken = (token, name) => {
   return `
     <h1>Hello ${name}</h1>
@@ -7,7 +8,7 @@ const getHtmlWithSecreteToken = (token, name) => {
   `;
 };
 
-const SendEmailTo = async (toUser) => {
+const SendEmailTo = async (toUserObject) => {
   const transporter = nodemailer.createTransport({
     host: "smtp.ethereal.email",
     port: 587,
@@ -19,12 +20,15 @@ const SendEmailTo = async (toUser) => {
   try {
     const result = transporter.sendMail({
       from: "chloe.ward@ethereal.email",
-      to: "atiqur.rahman951@gmail.com",
-      text: "Hello"
+      to: toUserObject.email,
+      subject: "Email Validation",
+      html: getHtmlWithSecreteToken(
+        toUserObject.email_validation_code,
+        toUserObject.name
+      ),
     });
-    console.log("Result ===>", result);
   } catch (err) {
-    console.log("Hello ===> ", err);
+    console.log("Error in SendEmailTo ", err);
     throw err;
   }
 };
