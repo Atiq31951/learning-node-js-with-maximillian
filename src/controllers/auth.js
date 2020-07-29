@@ -39,7 +39,7 @@ exports.PostLogin = async (req, res, next) => {
       res.redirect("/login");
       return;
     }
-    if (user) {
+    if (user & user.active) {
       const domatch = await bcrypt.compare(password, user.password);
       if (domatch) {
         req.session.isLoggedIn = true;
