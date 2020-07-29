@@ -1,5 +1,5 @@
 exports.isAuthenticated = (req, res, next) => {
-  if (req.session.user && req.session.isAuthenticated) {
+  if (req.session.user && req.session.isLoggedIn) {
     next();
     return;
   }
@@ -7,11 +7,11 @@ exports.isAuthenticated = (req, res, next) => {
 };
 
 exports.isAdmin = (req, res, next) => {
-  if (req.session.user && req.session.isAuthenticated && req.session.isAdmin) {
+  if (req.session.user && req.session.isLoggedIn && req.session.isAdmin) {
     next();
     return;
   }
-  if (req.session.user && req.session.isAuthenticated) {
+  if (req.session.user && req.session.isLoggedIn) {
     res.redirect("/");
     return;
   }

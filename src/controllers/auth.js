@@ -39,7 +39,8 @@ exports.PostLogin = async (req, res, next) => {
       res.redirect("/login");
       return;
     }
-    if (user & user.active) {
+
+    if (user && user.active) {
       const domatch = await bcrypt.compare(password, user.password);
       if (domatch) {
         req.session.isLoggedIn = true;
@@ -52,9 +53,10 @@ exports.PostLogin = async (req, res, next) => {
       } else {
         req.flash("error", "Invalid password....");
       }
+    } else {
+      res.redirect("/login");
+      return;
     }
-    res.redirect("/login");
-    return;
   } catch (err) {
     res.redirect("/login");
     console.log("Error in PostLogin", err);

@@ -24,7 +24,7 @@ app.set("views", Path.join(__dirname, "src", "views"));
 app.use(express.static(Path.join(__dirname, "src", "public")));
 
 // BodyParser
-app.use(bodyParser(urlencoded({ extended: false })));
+app.use(bodyParser(urlencoded({ extended: false, useNewUrlParser: true })));
 
 // Session section
 
