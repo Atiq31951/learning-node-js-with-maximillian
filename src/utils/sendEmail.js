@@ -1,11 +1,10 @@
 const nodemailer = require("nodemailer");
 
-const AuthConstants = require("../constants/auth")
+const AuthConstants = require("../constants/auth");
 
-const getDynamicHtml = ({ token, name, type, path}) => {
+const getDynamicHtml = ({ token, name, type, path }) => {
   switch (type) {
     case AuthConstants.TOKEN_TYPE.EMAIL_VALIDATION:
-      console.log("Hello")
       return `
         <h1>Hello ${name}</h1>
         <br>
@@ -20,9 +19,7 @@ const getDynamicHtml = ({ token, name, type, path}) => {
   }
 };
 
-
 const getSubject = (type) => {
-  console.log('Type ===> ', type)
   switch (type) {
     case AuthConstants.EMAIL_TYPE.EMAIL_VALIDATION:
       return AuthConstants.EMAIL_SUBJECT.EMAIL_VALIDATION;
@@ -30,7 +27,7 @@ const getSubject = (type) => {
     case AuthConstants.EMAIL_TYPE.EMAIL_FORGET_PASSWORD:
       return AuthConstants.EMAIL_SUBJECT.EMAIL_FORGET_PASSWORD;
   }
-}
+};
 
 const SendEmailTo = async (toUserObject) => {
   const transporter = nodemailer.createTransport({
@@ -48,7 +45,6 @@ const SendEmailTo = async (toUserObject) => {
       subject: getSubject(toUserObject.type),
       html: getDynamicHtml(toUserObject),
     });
-    console.log("result ====> ", result, getDynamicHtml(toUserObject));
   } catch (err) {
     console.log("Error in SendEmailTo ", err);
     throw err;

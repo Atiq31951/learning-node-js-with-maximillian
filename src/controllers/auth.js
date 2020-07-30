@@ -251,7 +251,6 @@ exports.GetResetPassword = async (req, res, next) => {
       });
       return;
     } else {
-      console.log(token, "\n", user.reset_password_token);
       res.redirect("/login");
     }
   } catch (error) {
@@ -269,8 +268,8 @@ exports.PostResetPassword = async (req, res, next) => {
       user.password = hashedPassword;
       user.reset_password_token = null;
       await user.save();
-      res.redirect('/login');
-      return
+      res.redirect("/login");
+      return;
     } else {
       res.redirect("/forget-password");
       return;
