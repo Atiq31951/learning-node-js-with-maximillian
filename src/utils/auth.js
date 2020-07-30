@@ -1,6 +1,3 @@
-const isLoggedIn = false;
-const isAdmin = false;
-
 const getCookiesObject = (request) => {
   const cookies = request.get("Cookie");
   const cookiesAsObject = {};
@@ -26,12 +23,8 @@ const getSixDigitOTP = () => {
   return fixedLengthString.substr(0, 6);
 };
 
-getLoggedIn = () => {
-  return isLoggedIn;
-};
 
 module.exports = {
   getCookiesObject,
-  getLoggedIn,
   getSixDigitOTP,
 };

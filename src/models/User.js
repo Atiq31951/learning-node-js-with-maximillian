@@ -69,6 +69,12 @@ const UserSchema = new Schema({
   email_validation_code: {
     type: String,
     required: false,
+    default: null,
+  },
+  reset_password_token: {
+    type: String,
+    required: false,
+    default: null,
   },
 });
 

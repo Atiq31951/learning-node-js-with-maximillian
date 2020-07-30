@@ -1,0 +1,21 @@
+module.exports = {
+  ROLE_SUPER_ADMIN: 1,
+  ROLE_ADMIN: 2,
+  ROLE_VENDOR: 3,
+  ROLE_USER: 5,
+
+  EMAIL_TYPE: {
+    EMAIL_VALIDATION: 1,
+    EMAIL_FORGET_PASSWORD: 2,
+  },
+
+  TOKEN_TYPE: {
+    EMAIL_VALIDATION: 1,
+    EMAIL_FORGET_PASSWORD: 2,
+  },
+
+  EMAIL_SUBJECT: {
+    EMAIL_VALIDATION: "Email Validation",
+    EMAIL_FORGET_PASSWORD: "Forget password",
+  },
+};

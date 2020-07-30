@@ -1,14 +1,17 @@
 const bcrypt = require("bcryptjs");
+const crypto = require("crypto");
 
 const User = require("../models/User");
+const AuthConstants = require("../constants/auth");
 
 const { SendEmailTo } = require("../utils/sendEmail");
 const { getSixDigitOTP } = require("../utils/auth");
 const auth = require("../utils/auth");
 
 exports.GetLogin = (req, res, next) => {
-  if (req.session.user) {
-    return next();
+  if (req.session.user || req.session.isLoggedIn || req.session.isAdmin) {
+    res.redirect("/");
+    return;
   }
   res.status(200);
   let errorMessage = req.flash("error");
@@ -116,7 +119,12 @@ exports.PostSignUp = async (req, res, next) => {
     }
     const hashedPassword = await bcrypt.hash(password, 12);
     const email_validation_code = getSixDigitOTP();
-    SendEmailTo({ email, name, email_validation_code });
+    SendEmailTo({
+      email,
+      name,
+      email_validation_code,
+      token_type: AuthConstants.EMAIL_TYPE.EMAIL_VALIDATION,
+    });
     const user = new User({
       name,
       email,
@@ -178,4 +186,98 @@ exports.PostActivate = async (req, res, next) => {
     res.redirect(`/activate?email=${email}`);
     console.log("Error in PostActivate ", err);
   }
+};
+
+exports.GetForgetPassword = (req, res, next) => {
+  res.render("pages/auth/forget-password", {
+    isAdmin: false,
+    isLoggedIn: true,
+    pageTitle: "Forget password",
+    path: "forget-password",
+    errorMessage: null,
+  });
+};
+
+exports.PostForgetPassword = async (req, res, next) => {
+  const { email } = req.body;
+  if (email) {
+    try {
+      const user = await User.findOne({ email });
+      if (!user) {
+        res.render("/forget-password");
+        return;
+      }
+      const cryptoBytesBuffer = await crypto.randomBytes(32);
+      const token = cryptoBytesBuffer.toString("hex");
+      user.reset_password_token = token;
+      await user.save();
+      SendEmailTo({
+        email,
+        name: user.name,
+        type: AuthConstants.TOKEN_TYPE.EMAIL_FORGET_PASSWORD,
+        token,
+        path: process.env.PRODUCTION
+          ? `${process.env.HOST_URL}forget-password/${token}?email=${email}`
+          : `http://localhost:3000/forget-password/${token}?email=${email}`,
+      });
+      req.flash();
+      res.redirect("/forget-password");
+      return;
+    } catch (error) {
+      console.log("Error in PostForgetPassword", error);
+      res.redirect("/forget-password");
+      return;
+    }
+  } else {
+    res.render("/forget-password");
+  }
+};
+
+exports.GetResetPassword = async (req, res, next) => {
+  const { token } = req.params;
+  const { email } = req.query;
+
+  try {
+    const user = await User.findOne({ email });
+    if (user.reset_password_token && user.reset_password_token === token) {
+      res.render("pages/auth/reset-password", {
+        email,
+        token,
+        isAdmin: false,
+        isLoggedIn: false,
+        pageTitle: "Reset password",
+        path: "reset-password",
+        errorMessage: null,
+      });
+      return;
+    } else {
+      console.log(token, "\n", user.reset_password_token);
+      res.redirect("/login");
+    }
+  } catch (error) {
+    console.log("Error in GetResetPassword", error);
+    res.redirect("/forget-password");
+  }
+};
+exports.PostResetPassword = async (req, res, next) => {
+  const { email } = req.query;
+  const { token, password } = req.body;
+  try {
+    const user = await User.findOne({ email });
+    if (user && user.reset_password_token === token) {
+      const hashedPassword = await bcrypt.hash(password, 12);
+      user.password = hashedPassword;
+      user.reset_password_token = null;
+      await user.save();
+      res.redirect('/login');
+      return
+    } else {
+      res.redirect("/forget-password");
+      return;
+    }
+  } catch (error) {
+    console.log("Error in PostResetPassword", error);
+    res.redirect("/forget-password");
+  }
+  res.redirect("/");
 };

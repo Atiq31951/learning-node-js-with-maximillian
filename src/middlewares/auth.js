@@ -18,3 +18,16 @@ exports.isAdmin = (req, res, next) => {
   res.redirect("/login");
   return;
 };
+
+exports.skipIfUserExists = (req, res, next) => {
+  if (
+    req.session &&
+    (req.session.isLoggedIn || req.session.isAdmin || req.session.user)
+  ) {
+    res.redirect('/');
+    return;
+  }
+  else {
+    next();
+  }
+};
