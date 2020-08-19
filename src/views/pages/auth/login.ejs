@@ -7,9 +7,16 @@
   <%- include('../../partials/navigation.ejs') %>
 
   <main>
-    <% if (errorMessage) { %>
+    <% if (errorMessage && ((Array.isArray(errorMessage) && errorMessage.length) || typeof errorMessage === 'string')) { %>
+      <% console.log("ErrorMessage ====> ", errorMessage) %>
     <div class="user-message user-message-error">
-      <%= errorMessage %>
+      <% if (errorMessage && Array.isArray(errorMessage) && errorMessage.length ) { %>
+        <% errorMessage.forEach(error => { %>
+          <%= error.msg %>
+        <% }) %>
+      <% } else { %>
+        <%= errorMessage %>
+      <% } %>
     </div>
     <% } %>
     <form class="login-form" action="/login" method="POST">

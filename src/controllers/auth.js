@@ -1,5 +1,6 @@
 const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
+const { validationResult } = require('express-validator')
 
 const User = require("../models/User");
 const AuthConstants = require("../constants/auth");
@@ -33,6 +34,22 @@ exports.PostLogin = async (req, res, next) => {
   if (req.session.user) {
     return next();
   }
+
+  let errors = validationResult(req).errors;
+  console.log('Errors ===> ', errors);
+  
+  if (!errors.isEmpty) {
+    console.log('Errors ===> ', errors);
+    res.status(422).render("pages/auth/login", {
+      pageTitle: "Login",
+      path: "/auth/login",
+      isLoggedIn: false,
+      isAdmin: false,
+      errorMessage: errors,
+    });
+    return;
+  }
+
   const { email, password } = req.body;
 
   try {
