@@ -139,8 +139,8 @@ exports.PostSignUp = async (req, res, next) => {
     SendEmailTo({
       email,
       name,
-      email_validation_code,
-      token_type: AuthConstants.EMAIL_TYPE.EMAIL_VALIDATION,
+      token: email_validation_code,
+      type: AuthConstants.EMAIL_TYPE.EMAIL_VALIDATION,
     });
     const user = new User({
       name,
